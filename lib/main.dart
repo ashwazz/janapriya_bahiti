@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -7,7 +8,13 @@ void main() {
 }
 
 double opacitylevel = 1;
+double opacitylevel2 = 1-opacitylevel;
+double opacitylevel3 = 0;
+double opacitylevel4 = 0;
 double scrollposition = 0;
+bool clicked = false;
+bool clicked1 = false;
+
 
 class WebApp extends StatefulWidget {
   WebApp({super.key});
@@ -61,7 +68,19 @@ class _WebAppState extends State<WebApp> with SingleTickerProviderStateMixin {
         scrollposition = _scrollController.offset / 1000;
       });
     });
+   
     super.initState();
+  }
+
+  void opacitycontrol(){
+    setState(() {
+      
+      opacitylevel2 = 0;
+      opacitylevel3 = 1;
+      _scrollToItem(3);
+      clicked = true;
+
+    });
   }
 
   @override
@@ -83,7 +102,7 @@ class _WebAppState extends State<WebApp> with SingleTickerProviderStateMixin {
                 slide3(),
               ],
             ),
-            Column(
+            clicked ? Container():  Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Row(
@@ -112,7 +131,7 @@ class _WebAppState extends State<WebApp> with SingleTickerProviderStateMixin {
                             ),
                           )
                         : AnimatedOpacity(
-                            opacity: 1 - opacitylevel,
+                            opacity:  opacitylevel2,
                             duration: Duration(seconds: 2),
                             child: Container(
                               height:
@@ -137,9 +156,14 @@ class _WebAppState extends State<WebApp> with SingleTickerProviderStateMixin {
                                           child: Row(
                                           
                                             children: [
-                                              IconButton(onPressed: (){}, icon: Icon(Icons.place_rounded) ,style: IconButton.styleFrom(backgroundColor: Colors.white,),),
+                                              IconButton(onPressed: (){
+                                                opacitycontrol();
+                                               
+                                              }, icon: Icon(Icons.place_rounded) ,style: IconButton.styleFrom(backgroundColor: Colors.white,),),
                                               SizedBox(width: MediaQuery.of(context).size.width*0.08,),
-                                              IconButton(onPressed: (){}, icon: Icon(Icons.place_rounded),style: IconButton.styleFrom(backgroundColor: Colors.white,),),
+                                              IconButton(onPressed: (){
+                                               opacitycontrol();
+                                              }, icon: Icon(Icons.place_rounded),style: IconButton.styleFrom(backgroundColor: Colors.white,),),
                                             ],
                                           ),
                                           
@@ -170,6 +194,7 @@ class _WebAppState extends State<WebApp> with SingleTickerProviderStateMixin {
                                         ),
                                       ],
                                     ),
+                                   
                                   ],
                                 ),
                               ),
@@ -219,9 +244,52 @@ class slide2 extends StatelessWidget {
     );
   }
 }
+class slide3 extends StatefulWidget {
+ 
 
-class slide3 extends StatelessWidget {
+
   const slide3({super.key});
+
+  @override
+  State<slide3> createState() => _slide3State();
+}
+
+class _slide3State extends State<slide3> with SingleTickerProviderStateMixin {
+  late AnimationController _animationControllerbelow;
+  
+  @override
+  void initState() {
+    super.initState();
+    _animationControllerbelow = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+      upperBound: 1,
+      lowerBound: 0,
+    );
+  }
+  
+  void _launchURL(String url) async {
+    if (await canLaunchUrl(Uri.parse(url))) {
+      await launchUrl(Uri.parse(url));
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+  void startAnimation() {
+    _animationControllerbelow.forward();
+  }
+  void updateOpacity(){
+    setState(() {
+      opacitylevel4 = 1;
+      clicked1 = true;
+    });
+  }
+
+  @override
+  void dispose() {
+    _animationControllerbelow.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -229,6 +297,82 @@ class slide3 extends StatelessWidget {
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height,
       color: const Color.fromARGB(255, 255, 255, 255),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Stack(
+            //alignment: Alignment.center,
+              
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Container(
+                  height: MediaQuery.of(context).size.height * 0.94,
+                  child: AnimatedOpacity(
+                    opacity: opacitylevel3,
+                    duration: Duration(seconds: 2),
+                    child: Lottie.asset(
+                      'assets/lottie/ne_camera_lottie.json',
+                      fit: BoxFit.fill,
+                      controller: _animationControllerbelow,
+                    ),
+                  ),
+                ),
+                
+              ],
+            ),
+            clicked1 ? Container():Container(
+              
+              margin: EdgeInsets.only(top: MediaQuery.of(context).size.height*0.45),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [ 
+                  SizedBox(width: MediaQuery.of(context).size.width*0.055,),
+                  IconButton(onPressed: (){
+                    startAnimation();
+      
+                    updateOpacity();
+                    print(opacitylevel4);
+      
+                  }, icon: const Icon(Icons.place) , style: IconButton.styleFrom(backgroundColor: Colors.white,iconSize: 40,),),
+                  SizedBox(width: MediaQuery.of(context).size.width*0.1,),
+                   IconButton(onPressed: (){
+                    startAnimation();
+                    updateOpacity();
+                                       }, icon: const Icon(Icons.place), style: IconButton.styleFrom(backgroundColor: Colors.white,iconSize: 40,),),
+                ],
+              ),
+            ),
+            Container(
+               margin: EdgeInsets.only(top: MediaQuery.of(context).size.height*0.33 , left: MediaQuery.of(context).size.width*0.15),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                   AnimatedOpacity(
+                    curve: Curves.easeInExpo,
+                     opacity: opacitylevel4,
+                     duration: Duration(seconds: 3),
+                     child: IconButton(onPressed: (){
+                      _launchURL('https://celumestudios.com/virtual-tour');
+                     }, icon: Icon(Icons.threed_rotation_sharp ), style: IconButton.styleFrom(backgroundColor: Colors.white,iconSize: 30
+                                        ,),),
+                   )
+                  ],
+                ),
+            )
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
+//  Future<void> _launchWebsite() async {
+//     if (await canLaunch(websiteLink)) {
+//       await launch(websiteLink);
+//     } else {
+//       throw 'Could not launch $websiteLink';
+//     }
+//   }
+
