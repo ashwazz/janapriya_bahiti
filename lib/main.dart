@@ -1,10 +1,12 @@
+// ignore_for_file: avoid_print, camel_case_types
+
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(WebApp());
+  runApp(const WebApp());
 }
 
 double opacitylevel = 1;
@@ -17,7 +19,7 @@ bool clicked1 = false;
 
 
 class WebApp extends StatefulWidget {
-  WebApp({super.key});
+  const WebApp({super.key});
 
   @override
   State<WebApp> createState() => _WebAppState();
@@ -31,12 +33,6 @@ class _WebAppState extends State<WebApp> with SingleTickerProviderStateMixin {
 
   //   _scrollController.addListener(_scrollListener);
   // }
-  void _scrollListener() {
-    double offset = _scrollController.offset;
-
-    double threshold1 = MediaQuery.of(context).size.height * 0.5;
-    double threshold5 = MediaQuery.of(context).size.height * 4.5;
-  }
 
   void _scrollToItem(int index) {
     if (_scrollController.hasClients) {
@@ -89,7 +85,8 @@ class _WebAppState extends State<WebApp> with SingleTickerProviderStateMixin {
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         appBar: AppBar(
-          title: Text('Web App'),
+          title: const Text('Web App'),
+          
         ),
         body: Stack(
           children: [
@@ -98,8 +95,8 @@ class _WebAppState extends State<WebApp> with SingleTickerProviderStateMixin {
               scrollDirection: Axis.vertical,
               children: [
                 slide1(onPressed: () => _scrollToItem(1)),
-                slide2(),
-                slide3(),
+                const slide2(),
+                const slide3(),
               ],
             ),
             clicked ? Container():  Column(
@@ -111,12 +108,12 @@ class _WebAppState extends State<WebApp> with SingleTickerProviderStateMixin {
                     scrollposition < 1.2
                         ? AnimatedOpacity(
                             opacity: opacitylevel,
-                            duration: Duration(seconds: 2),
+                            duration: const Duration(seconds: 2),
                             child: Container(
                               //margin: EdgeInsets.only(right: MediaQuery.of(context).size.width*0.05),
                               // width: MediaQuery.of(context).size.width*0.3,
                               height: MediaQuery.of(context).size.height * 0.94,
-                              color: Color.fromARGB(5, 0, 255, 60),
+                              color: const Color.fromARGB(5, 0, 255, 60),
                               child: Lottie.asset(
                                 'assets/lottie/1st_seq_lottie.json',
                                 controller: _animationController,
@@ -132,71 +129,69 @@ class _WebAppState extends State<WebApp> with SingleTickerProviderStateMixin {
                           )
                         : AnimatedOpacity(
                             opacity:  opacitylevel2,
-                            duration: Duration(seconds: 2),
+                            duration: const Duration(seconds: 2),
                             child: Container(
                               height:
                                   MediaQuery.of(context).size.height * 0.94,
-                              color: Color.fromARGB(5, 0, 255, 60),
-                              child: Container(
-                                child: Stack(
-                                  alignment: Alignment.topCenter,
-
-
-                                  children: [
-                                    Image.asset(
-                                      'assets/images/TopView.png',
-                                      fit: BoxFit.fill,
-                                    ),
-                                    Column(
-                                      mainAxisAlignment: MainAxisAlignment.start,
-                                     
-                                      children: [
-                                        Container(
-                                          margin: EdgeInsets.only(top: MediaQuery.of(context).size.height*0.075),
-                                          child: Row(
-                                          
-                                            children: [
-                                              IconButton(onPressed: (){
-                                                opacitycontrol();
-                                               
-                                              }, icon: Icon(Icons.place_rounded) ,style: IconButton.styleFrom(backgroundColor: Colors.white,),),
-                                              SizedBox(width: MediaQuery.of(context).size.width*0.08,),
-                                              IconButton(onPressed: (){
-                                               opacitycontrol();
-                                              }, icon: Icon(Icons.place_rounded),style: IconButton.styleFrom(backgroundColor: Colors.white,),),
-                                            ],
-                                          ),
-                                          
-                                        ),
-                                        Container(
-                                          margin: EdgeInsets.only(top: MediaQuery.of(context).size.height*0.26),
-                                          child: Row(
-                                          
-                                            children: [
-                                              IconButton(onPressed: (){}, icon: Icon(Icons.place_rounded) ,style: IconButton.styleFrom(backgroundColor: Colors.white,),),
-                                              SizedBox(width: MediaQuery.of(context).size.width*0.08,),
-                                              //IconButton(onPressed: (){}, icon: Icon(Icons.place_rounded),style: IconButton.styleFrom(backgroundColor: Colors.white,),),
-                                            ],
-                                          ),
-                                          
-                                        ),
-                                        Container(
-                                          margin: EdgeInsets.only(top: MediaQuery.of(context).size.height*0.32),
-                                          child: Row(
-                                          
-                                            children: [
-                                              IconButton(onPressed: (){}, icon: Icon(Icons.place_rounded) ,style: IconButton.styleFrom(backgroundColor: Colors.white,),),
-                                              SizedBox(width: MediaQuery.of(context).size.width*0.08,),
-                                              IconButton(onPressed: (){}, icon: Icon(Icons.place_rounded),style: IconButton.styleFrom(backgroundColor: Colors.white,),),
-                                            ],
-                                          ),
-                                          
-                                        ),
-                                      ],
-                                    ),
+                              color: const Color.fromARGB(5, 0, 255, 60),
+                              child: Stack(
+                                alignment: Alignment.topCenter,
+                              
+                              
+                                children: [
+                                  Image.asset(
+                                    'assets/images/TopView.png',
+                                    fit: BoxFit.fill,
+                                  ),
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
                                    
-                                  ],
-                                ),
+                                    children: [
+                                      Container(
+                                        margin: EdgeInsets.only(top: MediaQuery.of(context).size.height*0.075),
+                                        child: Row(
+                                        
+                                          children: [
+                                            IconButton(onPressed: (){
+                                              opacitycontrol();
+                                             
+                                            }, icon: const Icon(Icons.place_rounded) ,style: IconButton.styleFrom(backgroundColor: Colors.white,),),
+                                            SizedBox(width: MediaQuery.of(context).size.width*0.08,),
+                                            IconButton(onPressed: (){
+                                             opacitycontrol();
+                                            }, icon: const Icon(Icons.place_rounded),style: IconButton.styleFrom(backgroundColor: Colors.white,),),
+                                          ],
+                                        ),
+                                        
+                                      ),
+                                      Container(
+                                        margin: EdgeInsets.only(top: MediaQuery.of(context).size.height*0.26),
+                                        child: Row(
+                                        
+                                          children: [
+                                            IconButton(onPressed: (){}, icon: const Icon(Icons.place_rounded) ,style: IconButton.styleFrom(backgroundColor: Colors.white,),),
+                                            SizedBox(width: MediaQuery.of(context).size.width*0.08,),
+                                            //IconButton(onPressed: (){}, icon: Icon(Icons.place_rounded),style: IconButton.styleFrom(backgroundColor: Colors.white,),),
+                                          ],
+                                        ),
+                                        
+                                      ),
+                                      Container(
+                                        margin: EdgeInsets.only(top: MediaQuery.of(context).size.height*0.32),
+                                        child: Row(
+                                        
+                                          children: [
+                                            IconButton(onPressed: (){}, icon: const Icon(Icons.place_rounded) ,style: IconButton.styleFrom(backgroundColor: Colors.white,),),
+                                            SizedBox(width: MediaQuery.of(context).size.width*0.08,),
+                                            IconButton(onPressed: (){}, icon: const Icon(Icons.place_rounded),style: IconButton.styleFrom(backgroundColor: Colors.white,),),
+                                          ],
+                                        ),
+                                        
+                                      ),
+                                    ],
+                                  ),
+                                 
+                                ],
                               ),
                             ),
                         ),
@@ -225,7 +220,7 @@ class slide1 extends StatelessWidget {
       child: Center(
         child: ElevatedButton(
           onPressed: onPressed,
-          child: Text('Slide 1'),
+          child: const Text('Slide 1'),
         ),
       ),
     );
@@ -304,14 +299,27 @@ class _slide3State extends State<slide3> with SingleTickerProviderStateMixin {
             //alignment: Alignment.center,
               
             children: [
+             const Column( 
+               children: [
+                  Row(
+                    
+                     mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                 
+                      Center(child: Text('360° Virtual Tour',style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),),),
+                   
+                  ],),
+               ],
+             ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
               children: [
+                // ignore: sized_box_for_whitespace
                 Container(
                   height: MediaQuery.of(context).size.height * 0.94,
                   child: AnimatedOpacity(
                     opacity: opacitylevel3,
-                    duration: Duration(seconds: 2),
+                    duration: const Duration(seconds: 2),
                     child: Lottie.asset(
                       'assets/lottie/ne_camera_lottie.json',
                       fit: BoxFit.fill,
@@ -352,10 +360,10 @@ class _slide3State extends State<slide3> with SingleTickerProviderStateMixin {
                    AnimatedOpacity(
                     curve: Curves.easeInExpo,
                      opacity: opacitylevel4,
-                     duration: Duration(seconds: 3),
+                     duration: const Duration(seconds: 3),
                      child: IconButton(onPressed: (){
                       _launchURL('https://celumestudios.com/virtual-tour');
-                     }, icon: Icon(Icons.threed_rotation_sharp ), style: IconButton.styleFrom(backgroundColor: Colors.white,iconSize: 30
+                     }, icon: const Icon(Icons.threed_rotation_sharp ), style: IconButton.styleFrom(backgroundColor: Colors.white,iconSize: 30
                                         ,),),
                    )
                   ],
