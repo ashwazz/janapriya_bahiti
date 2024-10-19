@@ -1,203 +1,186 @@
-// ignore_for_file: avoid_print, camel_case_types
+// ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:lottie/lottie.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-  runApp(const WebApp());
+  runApp(MaterialApp(
+    debugShowCheckedModeBanner: false,
+    home: JanapriyaUpscalePage(),
+  ));
 }
 
-double opacitylevel = 1;
-double opacitylevel2 = 1-opacitylevel;
-double opacitylevel3 = 0;
-double opacitylevel4 = 0;
-double scrollposition = 0;
-bool clicked = false;
-bool clicked1 = false;
-
-
-class WebApp extends StatefulWidget {
-  const WebApp({super.key});
-
+class JanapriyaUpscalePage extends StatefulWidget {
   @override
-  State<WebApp> createState() => _WebAppState();
+  _JanapriyaUpscalePageState createState() => _JanapriyaUpscalePageState();
 }
 
-class _WebAppState extends State<WebApp> with SingleTickerProviderStateMixin {
-  final ScrollController _scrollController = ScrollController();
+class _JanapriyaUpscalePageState extends State<JanapriyaUpscalePage> with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
-  //  void initState() {
-  //   super.initState();
-
-  //   _scrollController.addListener(_scrollListener);
-  // }
-
-  void _scrollToItem(int index) {
-    if (_scrollController.hasClients) {
-      _scrollController.animateTo(
-        index * MediaQuery.of(context).size.height * 1.1,
-        duration: const Duration(seconds: 2),
-        curve: Curves.easeOutSine,
-      );
-      // print("has clients");
-    } else {
-      // print("no clients");
-    }
-  }
+  final ScrollController _scrollController = ScrollController();
+  bool _isAppBarVisible = true;
 
   @override
   void initState() {
-    _animationController = AnimationController(
-        vsync: this,
-        duration: const Duration(seconds: 3),
-        upperBound: 1,
-        lowerBound: 0);
-    _scrollController.addListener(() {
-      print(_scrollController.offset / 1000);
-      _animationController.value = (_scrollController.offset / 1000) > 1
-          ? 1
-          : (_scrollController.offset / 1000);
-      setState(() {
-        opacitylevel = _scrollController.offset / 1000 > 1.1 ? 0 : 1;
-        scrollposition = _scrollController.offset / 1000;
-      });
-    });
-   
     super.initState();
+    
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 3),
+    );
+
+    _scrollController.addListener(() {
+      double progress = _scrollController.offset / _scrollController.position.maxScrollExtent;
+      _animationController.value = progress > 1 ? 1 : progress;
+
+      // Show/Hide AppBar based on scroll direction
+      if (_scrollController.position.userScrollDirection == ScrollDirection.reverse) {
+        setState(() {
+          _isAppBarVisible = false;
+        });
+      } else if (_scrollController.position.userScrollDirection == ScrollDirection.forward) {
+        setState(() {
+          _isAppBarVisible = true;
+        });
+      }
+    });
   }
 
-  void opacitycontrol(){
-    setState(() {
-      
-      opacitylevel2 = 0;
-      opacitylevel3 = 1;
-      _scrollToItem(3);
-      clicked = true;
-
-    });
+  @override
+  void dispose() {
+    _animationController.dispose();
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Web App'),
-          
-        ),
-        body: Stack(
-          children: [
-            ListView(
-              controller: _scrollController,
-              scrollDirection: Axis.vertical,
-              children: [
-                slide1(onPressed: () => _scrollToItem(1)),
-                const slide2(),
-                const slide3(),
-              ],
-            ),
-            clicked ? Container():  Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    scrollposition < 1.2
-                        ? AnimatedOpacity(
-                            opacity: opacitylevel,
-                            duration: const Duration(seconds: 2),
-                            child: Container(
-                              //margin: EdgeInsets.only(right: MediaQuery.of(context).size.width*0.05),
-                              // width: MediaQuery.of(context).size.width*0.3,
-                              height: MediaQuery.of(context).size.height * 0.94,
-                              color: const Color.fromARGB(5, 0, 255, 60),
-                              child: Lottie.asset(
-                                'assets/lottie/1st_seq_lottie.json',
-                                controller: _animationController,
-                                fit: BoxFit.fill,
-                                // onLoaded: (animation) {
-
-                                //   _animationController
-                                //     ..duration = animation.duration
-                                //     ..repeat(reverse: true);
-                                // },
-                              ),
-                            ),
-                          )
-                        : AnimatedOpacity(
-                            opacity:  opacitylevel2,
-                            duration: const Duration(seconds: 2),
-                            child: Container(
-                              height:
-                                  MediaQuery.of(context).size.height * 0.94,
-                              color: const Color.fromARGB(5, 0, 255, 60),
-                              child: Stack(
-                                alignment: Alignment.topCenter,
-                              
-                              
-                                children: [
-                                  Image.asset(
-                                    'assets/images/TopView.png',
-                                    fit: BoxFit.fill,
-                                  ),
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                   
-                                    children: [
-                                      Container(
-                                        margin: EdgeInsets.only(top: MediaQuery.of(context).size.height*0.075),
-                                        child: Row(
-                                        
-                                          children: [
-                                            IconButton(onPressed: (){
-                                              opacitycontrol();
-                                             
-                                            }, icon: const Icon(Icons.place_rounded) ,style: IconButton.styleFrom(backgroundColor: Colors.white,),),
-                                            SizedBox(width: MediaQuery.of(context).size.width*0.08,),
-                                            IconButton(onPressed: (){
-                                             opacitycontrol();
-                                            }, icon: const Icon(Icons.place_rounded),style: IconButton.styleFrom(backgroundColor: Colors.white,),),
-                                          ],
-                                        ),
-                                        
-                                      ),
-                                      Container(
-                                        margin: EdgeInsets.only(top: MediaQuery.of(context).size.height*0.26),
-                                        child: Row(
-                                        
-                                          children: [
-                                            IconButton(onPressed: (){}, icon: const Icon(Icons.place_rounded) ,style: IconButton.styleFrom(backgroundColor: Colors.white,),),
-                                            SizedBox(width: MediaQuery.of(context).size.width*0.08,),
-                                            //IconButton(onPressed: (){}, icon: Icon(Icons.place_rounded),style: IconButton.styleFrom(backgroundColor: Colors.white,),),
-                                          ],
-                                        ),
-                                        
-                                      ),
-                                      Container(
-                                        margin: EdgeInsets.only(top: MediaQuery.of(context).size.height*0.32),
-                                        child: Row(
-                                        
-                                          children: [
-                                            IconButton(onPressed: (){}, icon: const Icon(Icons.place_rounded) ,style: IconButton.styleFrom(backgroundColor: Colors.white,),),
-                                            SizedBox(width: MediaQuery.of(context).size.width*0.08,),
-                                            IconButton(onPressed: (){}, icon: const Icon(Icons.place_rounded),style: IconButton.styleFrom(backgroundColor: Colors.white,),),
-                                          ],
-                                        ),
-                                        
-                                      ),
-                                    ],
-                                  ),
-                                 
-                                ],
-                              ),
-                            ),
-                        ),
-                  ],
+    return Scaffold(
+      backgroundColor: Colors.white,
+      extendBodyBehindAppBar: true,
+      appBar: _isAppBarVisible
+          ? AppBar(
+              backgroundColor: Colors.white.withOpacity(0.8),
+              flexibleSpace: Container(
+                decoration: BoxDecoration(
+                  color: Colors.black12
+                  // gradient: LinearGradient(
+                  //   colors: [Colors.white, Colors.black12],
+                  //   begin: Alignment.topCenter,
+                  //   end: Alignment.bottomCenter,
+                  // ),
                 ),
-              ],
+              ),
+              title: Row(
+                children: [
+                  Text(
+                    'Janapriya UPSCALE',
+                    style: TextStyle(color: Colors.black),
+                  ),
+                  Spacer(),
+                  _NavBarItem(title: 'Home'),
+                  _NavBarItem(title: 'Store'),
+                  _NavBarItem(title: 'Projects'),
+                  _NavBarItem(title: 'Technology'),
+                  _NavBarItem(title: 'About Us'),
+                  _NavBarItem(title: 'Contact'),
+                  IconButton(
+                    icon: Icon(Icons.account_circle, color: Colors.black),
+                    onPressed: () {},
+                  ),
+                ],
+              ),
+              elevation: 0,
+              automaticallyImplyLeading: false,
+            )
+          : null,
+      body: SafeArea(
+        child: Row(
+          children: [
+            Expanded(
+              flex: 3,
+              child: Padding(
+                padding: const EdgeInsets.all(32.0),
+                child: SingleChildScrollView(
+                  controller: _scrollController,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Janapriya Upscale Bahiti',
+                        style: TextStyle(
+                          fontSize: 36,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        'Chandanagar',
+                        style: TextStyle(
+                          fontSize: 24,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                      SizedBox(height: 24),
+                      _CustomTextField(hintText: 'Name'),
+                      _CustomTextField(hintText: 'Email'),
+                      _CustomTextField(hintText: 'Phone'),
+                      _CustomDropdown(items: ['Apartment', 'Villa', 'Plot'], hintText: 'Property Unit Type'),
+                      _CustomDropdown(items: ['Morning', 'Afternoon', 'Evening'], hintText: 'Preferred Site Visit'),
+                      SizedBox(height: 16),
+                      Row(
+                        children: [
+                          Checkbox(value: true, onChanged: (value) {}),
+                          Expanded(
+                            child: Text(
+                              'I allow Janapriya Upscale representatives to override DND registration (if any) and contact me through call, SMS, email or WhatsApp.',
+                            ),
+                          ),
+                          
+                        ],
+                      ),
+                      SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: () {},
+                        child: Text('Submit'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue,
+                          padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                        ),
+                      ),
+                      SizedBox(height: 32),
+                      Image.asset('assets/images/info.jpg'), // Add the new image here
+                      SizedBox(height: 30,),
+                      Text("Select any house of your preference in 3 steps"),
+                          ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => Screen2()),
+                              );
+                            },
+                            child: Text("Select house"),
+                          ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Expanded(
+              flex: 2,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Lottie.asset(
+                  'assets/lottie/1st_seq_lottie.json',
+                  width: MediaQuery.of(context).size.width * 0.3, // Limit Lottie file width to 0.3 screen width
+                  controller: _animationController,
+                  onLoaded: (composition) {
+                    _animationController.duration = composition.duration;
+                  },
+                ),
+              ),
             ),
           ],
         ),
@@ -206,181 +189,372 @@ class _WebAppState extends State<WebApp> with SingleTickerProviderStateMixin {
   }
 }
 
-class slide1 extends StatelessWidget {
-  final VoidCallback onPressed;
+class _NavBarItem extends StatelessWidget {
+  final String title;
 
-  const slide1({super.key, required this.onPressed});
+  const _NavBarItem({required this.title});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.height * 1,
-      color: const Color.fromARGB(255, 255, 255, 255),
-      child: Center(
-        child: ElevatedButton(
-          onPressed: onPressed,
-          child: const Text('Slide 1'),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Text(
+        title,
+        style: TextStyle(color: Colors.black, fontSize: 16),
+      ),
+    );
+  }
+}
+
+class Screen2 extends StatelessWidget {
+  const Screen2({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              flex: 2,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Choose Your Home',
+                    style: TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.redAccent,
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    'in 3 Simple Steps',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  SizedBox(height: 24),
+                  Text(
+                    'Step 1: Select a Block',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.redAccent,
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    'Please choose any apartment block from the map to begin the process.',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.grey[700],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(width: 20),
+            Expanded(
+              flex: 5,
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => SideSelectionScreen()),
+                  );
+                },
+                child: Container(
+                  height: MediaQuery.of(context).size.height,
+                  child: Image.asset(
+                    'assets/images/TOPVIEW (1).jpg',
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-class slide2 extends StatelessWidget {
-  const slide2({super.key});
+
+
+
+
+class SideSelectionScreen extends StatefulWidget {
+  const SideSelectionScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.height,
-      color: const Color.fromARGB(255, 255, 255, 255),
-    );
-  }
-}
-class slide3 extends StatefulWidget {
- 
-
-
-  const slide3({super.key});
-
-  @override
-  State<slide3> createState() => _slide3State();
+  State<SideSelectionScreen> createState() => _SideSelectionScreenState();
 }
 
-class _slide3State extends State<slide3> with SingleTickerProviderStateMixin {
-  late AnimationController _animationControllerbelow;
-  
+class _SideSelectionScreenState extends State<SideSelectionScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  bool _showInitialImage = true;
+  bool _showLottieAnimation = false;
+  bool _showFinalSlide = false; // Single final slide
+
   @override
   void initState() {
     super.initState();
-    _animationControllerbelow = AnimationController(
+    _animationController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
-      upperBound: 1,
-      lowerBound: 0,
-    );
+    )..addStatusListener((status) {
+        if (status == AnimationStatus.completed) {
+          setState(() {
+            _showLottieAnimation = false;
+            _showFinalSlide = true; // Show the final slide after animation
+          });
+        }
+      });
   }
-  
-  void _launchURL(String url) async {
-    if (await canLaunchUrl(Uri.parse(url))) {
-      await launchUrl(Uri.parse(url));
-    } else {
-      throw 'Could not launch $url';
-    }
-  }
-  void startAnimation() {
-    _animationControllerbelow.forward();
-  }
-  void updateOpacity(){
-    setState(() {
-      opacitylevel4 = 1;
-      clicked1 = true;
-    });
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Preload images for smoother transitions
+    precacheImage(AssetImage('assets/images/build1.jpg'), context);
+    precacheImage(AssetImage('assets/images/build2.jpg'), context);
+    
+    // Preload Lottie animation
+    precacheImage(NetworkImage('https://assets/lottiefiles.com/path/to/your/lottie.json'), context);
   }
 
   @override
   void dispose() {
-    _animationControllerbelow.dispose();
+    _animationController.dispose();
     super.dispose();
+  }
+
+  void _onTap() {
+    // Reset state if the final slide is shown
+    if (_showFinalSlide) {
+      setState(() {
+        _showFinalSlide = false; // Hide the final slide
+        _showInitialImage = true; // Reset to initial image
+      });
+      return; // Exit early if final slide is shown
+    }
+
+    // Play Lottie animation on first image tap
+    if (_showInitialImage) {
+      print("Tapped on initial image. Starting Lottie animation.");
+      setState(() {
+        _showInitialImage = false;
+        _showLottieAnimation = true;
+      });
+      _animationController.forward(from: 0);
+    } 
+    // Handle tapping on the final slide image
+    else if (_showFinalSlide) {
+      _openLink(); // Launch the URL
+    }
+  }
+
+  void _openLink() async {
+    const url = 'https://celumestudios.com/virtual-tour';
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.height,
-      color: const Color.fromARGB(255, 255, 255, 255),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Stack(
-            //alignment: Alignment.center,
-              
-            children: [
-             const Column( 
-               children: [
-                  Row(
-                    
-                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                 
-                      Center(child: Text('360° Virtual Tour',style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),),),
-                   
-                  ],),
-               ],
-             ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                // ignore: sized_box_for_whitespace
-                Container(
-                  height: MediaQuery.of(context).size.height * 0.94,
-                  child: AnimatedOpacity(
-                    opacity: opacitylevel3,
-                    duration: const Duration(seconds: 2),
-                    child: Lottie.asset(
-                      'assets/lottie/ne_camera_lottie.json',
-                      fit: BoxFit.fill,
-                      controller: _animationControllerbelow,
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Choose Building Side'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              flex: 2,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Choose Your Home',
+                    style: TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.redAccent,
                     ),
                   ),
-                ),
-                
-              ],
-            ),
-            clicked1 ? Container():Container(
-              
-              margin: EdgeInsets.only(top: MediaQuery.of(context).size.height*0.45),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [ 
-                  SizedBox(width: MediaQuery.of(context).size.width*0.055,),
-                  IconButton(onPressed: (){
-                    startAnimation();
-      
-                    updateOpacity();
-                    print(opacitylevel4);
-      
-                  }, icon: const Icon(Icons.place) , style: IconButton.styleFrom(backgroundColor: Colors.white,iconSize: 40,),),
-                  SizedBox(width: MediaQuery.of(context).size.width*0.1,),
-                   IconButton(onPressed: (){
-                    startAnimation();
-                    updateOpacity();
-                                       }, icon: const Icon(Icons.place), style: IconButton.styleFrom(backgroundColor: Colors.white,iconSize: 40,),),
+                  SizedBox(height: 8),
+                  Text(
+                    'in 3 Simple Steps',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  SizedBox(height: 24),
+                  Text(
+                    'Step 1: Select a Block',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.redAccent,
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    'Please choose any apartment block from the map to begin the process.',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.grey[700],
+                    ),
+                  ),
+                  SizedBox(height: 24),
+                  Text(
+                    'Step 2: Choose the Side',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.redAccent,
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    'Please choose if you want the apartment to be front-facing or back-facing.',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.grey[700],
+                    ),
+                  ),
+                  const SizedBox(height: 24), // Spacing between image and text
+                  // Step 3 Text is displayed only if the final slide is visible
+                  if (_showFinalSlide) ...[
+                    Text(
+                      'Step 3: Check the Interior',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.redAccent,
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      'Click on the image above to view the interior of the building.',
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.grey[700],
+                      ),
+                      textAlign: TextAlign.center, // Center align text
+                    ),
+                  ],
                 ],
               ),
             ),
-            Container(
-               margin: EdgeInsets.only(top: MediaQuery.of(context).size.height*0.33 , left: MediaQuery.of(context).size.width*0.15),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
+            SizedBox(width: 20),
+            Expanded(
+              flex: 5,
+              child: GestureDetector(
+                onTap: _onTap,
+                child: Stack(
+                  alignment: Alignment.center,
                   children: [
-                   AnimatedOpacity(
-                    curve: Curves.easeInExpo,
-                     opacity: opacitylevel4,
-                     duration: const Duration(seconds: 3),
-                     child: IconButton(onPressed: (){
-                      _launchURL('https://celumestudios.com/virtual-tour');
-                     }, icon: const Icon(Icons.threed_rotation_sharp ), style: IconButton.styleFrom(backgroundColor: Colors.white,iconSize: 30
-                                        ,),),
-                   )
+                    if (_showInitialImage)
+                      Image.asset(
+                        'assets/images/build1.jpg',
+                        fit: BoxFit.contain,
+                        width: double.infinity,
+                        height: MediaQuery.of(context).size.height,
+                      ),
+                    if (_showLottieAnimation)
+                      Lottie.asset(
+                        'assets/lottie/ne_camera_lottie.json',
+                        controller: _animationController,
+                        onLoaded: (composition) {
+                          _animationController.duration = composition.duration;
+                        },
+                      ),
+                    // Show the final slide with Step 3
+                    if (_showFinalSlide)
+                      GestureDetector(
+                        onTap: _openLink, // Launch URL on image tap
+                        child: Image.asset(
+                          'assets/images/build2.jpg', // Final image path
+                          fit: BoxFit.contain,
+                          // width: double.infinity,
+                          height: MediaQuery.of(context).size.height, // Adjust height for layout
+                        ),
+                      ),
                   ],
                 ),
-            )
-            ],
-          ),
-        ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
-//  Future<void> _launchWebsite() async {
-//     if (await canLaunch(websiteLink)) {
-//       await launch(websiteLink);
-//     } else {
-//       throw 'Could not launch $websiteLink';
-//     }
-//   }
 
+
+
+
+
+
+
+
+class _CustomTextField extends StatelessWidget {
+  final String hintText;
+
+  const _CustomTextField({required this.hintText});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: TextField(
+        decoration: InputDecoration(
+          border: OutlineInputBorder(),
+          hintText: hintText,
+        ),
+      ),
+    );
+  }
+}
+
+class _CustomDropdown extends StatelessWidget {
+  final List<String> items;
+  final String hintText;
+
+  const _CustomDropdown({required this.items, required this.hintText});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: DropdownButtonFormField<String>(
+        decoration: InputDecoration(
+          border: OutlineInputBorder(),
+        ),
+        hint: Text(hintText),
+        items: items.map((String value) {
+          return DropdownMenuItem<String>(
+            value: value,
+            child: Text(value),
+          );
+        }).toList(),
+        onChanged: (value) {},
+      ),
+    );
+  }
+}
