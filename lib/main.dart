@@ -12,6 +12,8 @@ void main() {
   ));
 }
 
+
+
 class JanapriyaUpscalePage extends StatefulWidget {
   @override
   _JanapriyaUpscalePageState createState() => _JanapriyaUpscalePageState();
@@ -21,30 +23,83 @@ class _JanapriyaUpscalePageState extends State<JanapriyaUpscalePage> with Single
   late AnimationController _animationController;
   final ScrollController _scrollController = ScrollController();
   bool _isAppBarVisible = true;
+  double _lastScrollOffset = 0.0;
+  double _scrollSpeed = 0.0;
+  bool _isAutoScrolling = false;
 
   @override
   void initState() {
     super.initState();
-    
+
+    // Initialize the animation controller for Lottie animation
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 3),
     );
 
+    // Add a listener to the ScrollController to update Lottie animation based on scroll position
     _scrollController.addListener(() {
-      double progress = _scrollController.offset / _scrollController.position.maxScrollExtent;
-      _animationController.value = progress > 1 ? 1 : progress;
+      if (!_isAutoScrolling) {
+        // Calculate scroll speed
+        _scrollSpeed = (_scrollController.offset - _lastScrollOffset).abs();
+        _lastScrollOffset = _scrollController.offset;
 
-      // Show/Hide AppBar based on scroll direction
-      if (_scrollController.position.userScrollDirection == ScrollDirection.reverse) {
-        setState(() {
-          _isAppBarVisible = false;
-        });
-      } else if (_scrollController.position.userScrollDirection == ScrollDirection.forward) {
-        setState(() {
-          _isAppBarVisible = true;
-        });
+        // Sync Lottie animation with scroll
+        _syncLottieWithScroll();
+
+        // Trigger auto-scroll if user scrolls too fast
+        if (_scrollSpeed > 30) { // Adjust threshold as needed
+          _triggerAutoScroll();
+        }
+
+        // Show or hide the app bar based on scroll direction
+        if (_scrollController.position.userScrollDirection == ScrollDirection.reverse) {
+          setState(() {
+            _isAppBarVisible = false;
+          });
+        } else if (_scrollController.position.userScrollDirection == ScrollDirection.forward) {
+          setState(() {
+            _isAppBarVisible = true;
+          });
+        }
       }
+    });
+
+    // Delay the auto-scrolling until after the first frame is rendered
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _triggerAutoScroll();
+    });
+  }
+
+  // Sync Lottie animation with the current scroll position
+  void _syncLottieWithScroll() {
+    double maxScrollExtent = _scrollController.position.maxScrollExtent;
+    double scrollOffset = _scrollController.offset;
+
+    // Calculate the target animation progress based on scroll percentage
+    double targetProgress = (scrollOffset / maxScrollExtent).clamp(0.0, 1.0);
+
+    // Smoothly transition the animation controller value to the target progress
+    _animationController.animateTo(
+      targetProgress,
+      duration: const Duration(milliseconds: 300), // Adjust duration for smoothness
+      curve: Curves.easeInOut,
+    );
+  }
+
+  // Trigger auto-scrolling and sync with Lottie animation
+  void _triggerAutoScroll() {
+    _isAutoScrolling = true;
+
+    // Scroll to the bottom smoothly, or continue scrolling if at maxScrollExtent
+    _scrollController.animateTo(
+      _scrollController.position.maxScrollExtent, // Scroll to the bottom
+      duration: const Duration(seconds: 3), // Adjust speed to match your needs
+      curve: Curves.easeOut,
+    ).then((_) {
+      // Ensure Lottie animation is synced
+      _syncLottieWithScroll();
+      _isAutoScrolling = false;
     });
   }
 
@@ -64,30 +119,25 @@ class _JanapriyaUpscalePageState extends State<JanapriyaUpscalePage> with Single
           ? AppBar(
               backgroundColor: Colors.white.withOpacity(0.8),
               flexibleSpace: Container(
-                decoration: BoxDecoration(
-                  color: Colors.black12
-                  // gradient: LinearGradient(
-                  //   colors: [Colors.white, Colors.black12],
-                  //   begin: Alignment.topCenter,
-                  //   end: Alignment.bottomCenter,
-                  // ),
+                decoration: const BoxDecoration(
+                  color: Colors.black12,
                 ),
               ),
               title: Row(
                 children: [
-                  Text(
-                    'Janapriya UPSCALE',
-                    style: TextStyle(color: Colors.black),
+                  Container(
+                    height: MediaQuery.of(context).size.height * 0.08,
+                    child: Image.asset("assets/images/jana_logo.png"),
                   ),
-                  Spacer(),
-                  _NavBarItem(title: 'Home'),
-                  _NavBarItem(title: 'Store'),
-                  _NavBarItem(title: 'Projects'),
-                  _NavBarItem(title: 'Technology'),
-                  _NavBarItem(title: 'About Us'),
-                  _NavBarItem(title: 'Contact'),
+                  const Spacer(),
+                  const _NavBarItem(title: 'Home'),
+                  const _NavBarItem(title: 'Store'),
+                  const _NavBarItem(title: 'Projects'),
+                  const _NavBarItem(title: 'Technology'),
+                  const _NavBarItem(title: 'About Us'),
+                  const _NavBarItem(title: 'Contact'),
                   IconButton(
-                    icon: Icon(Icons.account_circle, color: Colors.black),
+                    icon: const Icon(Icons.account_circle, color: Colors.black),
                     onPressed: () {},
                   ),
                 ],
@@ -108,14 +158,14 @@ class _JanapriyaUpscalePageState extends State<JanapriyaUpscalePage> with Single
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         'Janapriya Upscale Bahiti',
                         style: TextStyle(
                           fontSize: 36,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       Text(
                         'Chandanagar',
                         style: TextStyle(
@@ -123,46 +173,66 @@ class _JanapriyaUpscalePageState extends State<JanapriyaUpscalePage> with Single
                           color: Colors.grey[600],
                         ),
                       ),
-                      SizedBox(height: 24),
-                      _CustomTextField(hintText: 'Name'),
-                      _CustomTextField(hintText: 'Email'),
-                      _CustomTextField(hintText: 'Phone'),
-                      _CustomDropdown(items: ['Apartment', 'Villa', 'Plot'], hintText: 'Property Unit Type'),
-                      _CustomDropdown(items: ['Morning', 'Afternoon', 'Evening'], hintText: 'Preferred Site Visit'),
-                      SizedBox(height: 16),
+                      const SizedBox(height: 24),
+                      const _CustomTextField(hintText: 'Name'),
+                      const _CustomTextField(hintText: 'Email'),
+                      const _CustomTextField(hintText: 'Phone'),
+                      const _CustomDropdown(items: ['Apartment', 'Villa', 'Plot'], hintText: 'Property Unit Type'),
+                      const _CustomDropdown(items: ['Morning', 'Afternoon', 'Evening'], hintText: 'Preferred Site Visit'),
+                      const SizedBox(height: 16),
                       Row(
                         children: [
                           Checkbox(value: true, onChanged: (value) {}),
-                          Expanded(
+                          const Expanded(
                             child: Text(
                               'I allow Janapriya Upscale representatives to override DND registration (if any) and contact me through call, SMS, email or WhatsApp.',
                             ),
                           ),
-                          
                         ],
                       ),
-                      SizedBox(height: 16),
+                      const SizedBox(height: 16),
                       ElevatedButton(
                         onPressed: () {},
-                        child: Text('Submit'),
+                        child: const Text('Submit'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.blue,
-                          padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                         ),
                       ),
-                      SizedBox(height: 32),
-                      Image.asset('assets/images/info.jpg'), // Add the new image here
-                      SizedBox(height: 30,),
-                      Text("Select any house of your preference in 3 steps"),
+                      const SizedBox(height: 30),
+                      const Text(
+                        "Try our method of choosing a house of your preference in 3 steps",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          const Text("==>"),
                           ElevatedButton(
                             onPressed: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => Screen2()),
+                                MaterialPageRoute(builder: (context) => const Screen2()),
                               );
                             },
-                            child: Text("Select house"),
+                            child: const Text(
+                              "Step-1",
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.redAccent,
+                              ),
+                            ),
                           ),
+                        ],
+                      ),
+                      const SizedBox(height: 32),
+                      const Text("The Houses have the following amenities available"),
+                      const SizedBox(height: 32),
+                      Image.asset('assets/images/info.jpg'), // Add the new image here
                     ],
                   ),
                 ),
@@ -174,8 +244,8 @@ class _JanapriyaUpscalePageState extends State<JanapriyaUpscalePage> with Single
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Lottie.asset(
                   'assets/lottie/1st_seq_lottie.json',
-                  width: MediaQuery.of(context).size.width * 0.3, // Limit Lottie file width to 0.3 screen width
                   controller: _animationController,
+                  width: MediaQuery.of(context).size.width * 0.3, // Limit Lottie file width to 0.3 screen width
                   onLoaded: (composition) {
                     _animationController.duration = composition.duration;
                   },
@@ -189,6 +259,11 @@ class _JanapriyaUpscalePageState extends State<JanapriyaUpscalePage> with Single
   }
 }
 
+
+
+
+
+
 class _NavBarItem extends StatelessWidget {
   final String title;
 
@@ -200,7 +275,7 @@ class _NavBarItem extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Text(
         title,
-        style: TextStyle(color: Colors.black, fontSize: 16),
+        style: const TextStyle(color: Colors.black, fontSize: 16),
       ),
     );
   }
@@ -222,7 +297,7 @@ class Screen2 extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'Choose Your Home',
                     style: TextStyle(
                       fontSize: 32,
@@ -230,8 +305,8 @@ class Screen2 extends StatelessWidget {
                       color: Colors.redAccent,
                     ),
                   ),
-                  SizedBox(height: 8),
-                  Text(
+                  const SizedBox(height: 8),
+                  const Text(
                     'in 3 Simple Steps',
                     style: TextStyle(
                       fontSize: 20,
@@ -239,8 +314,8 @@ class Screen2 extends StatelessWidget {
                       color: Colors.black87,
                     ),
                   ),
-                  SizedBox(height: 24),
-                  Text(
+                  const SizedBox(height: 24),
+                  const Text(
                     'Step 1: Select a Block',
                     style: TextStyle(
                       fontSize: 24,
@@ -248,7 +323,7 @@ class Screen2 extends StatelessWidget {
                       color: Colors.redAccent,
                     ),
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Text(
                     'Please choose any apartment block from the map to begin the process.',
                     style: TextStyle(
@@ -259,14 +334,14 @@ class Screen2 extends StatelessWidget {
                 ],
               ),
             ),
-            SizedBox(width: 20),
+            const SizedBox(width: 20),
             Expanded(
               flex: 5,
               child: GestureDetector(
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => SideSelectionScreen()),
+                    MaterialPageRoute(builder: (context) => const SideSelectionScreen()),
                   );
                 },
                 child: Container(
@@ -323,11 +398,11 @@ class _SideSelectionScreenState extends State<SideSelectionScreen>
   void didChangeDependencies() {
     super.didChangeDependencies();
     // Preload images for smoother transitions
-    precacheImage(AssetImage('assets/images/build1.jpg'), context);
-    precacheImage(AssetImage('assets/images/build2.jpg'), context);
+    precacheImage(const AssetImage('assets/images/build1.jpg'), context);
+    precacheImage(const AssetImage('assets/images/build2.jpg'), context);
     
     // Preload Lottie animation
-    precacheImage(NetworkImage('https://assets/lottiefiles.com/path/to/your/lottie.json'), context);
+    precacheImage(const NetworkImage('https://assets/lottiefiles.com/path/to/your/lottie.json'), context);
   }
 
   @override
@@ -386,7 +461,7 @@ class _SideSelectionScreenState extends State<SideSelectionScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'Choose Your Home',
                     style: TextStyle(
                       fontSize: 32,
@@ -394,8 +469,8 @@ class _SideSelectionScreenState extends State<SideSelectionScreen>
                       color: Colors.redAccent,
                     ),
                   ),
-                  SizedBox(height: 8),
-                  Text(
+                  const SizedBox(height: 8),
+                  const Text(
                     'in 3 Simple Steps',
                     style: TextStyle(
                       fontSize: 20,
@@ -403,8 +478,8 @@ class _SideSelectionScreenState extends State<SideSelectionScreen>
                       color: Colors.black87,
                     ),
                   ),
-                  SizedBox(height: 24),
-                  Text(
+                  const SizedBox(height: 24),
+                  const Text(
                     'Step 1: Select a Block',
                     style: TextStyle(
                       fontSize: 24,
@@ -412,7 +487,7 @@ class _SideSelectionScreenState extends State<SideSelectionScreen>
                       color: Colors.redAccent,
                     ),
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Text(
                     'Please choose any apartment block from the map to begin the process.',
                     style: TextStyle(
@@ -420,8 +495,8 @@ class _SideSelectionScreenState extends State<SideSelectionScreen>
                       color: Colors.grey[700],
                     ),
                   ),
-                  SizedBox(height: 24),
-                  Text(
+                  const SizedBox(height: 24),
+                  const Text(
                     'Step 2: Choose the Side',
                     style: TextStyle(
                       fontSize: 24,
@@ -429,7 +504,7 @@ class _SideSelectionScreenState extends State<SideSelectionScreen>
                       color: Colors.redAccent,
                     ),
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Text(
                     'Please choose if you want the apartment to be front-facing or back-facing.',
                     style: TextStyle(
@@ -440,7 +515,7 @@ class _SideSelectionScreenState extends State<SideSelectionScreen>
                   const SizedBox(height: 24), // Spacing between image and text
                   // Step 3 Text is displayed only if the final slide is visible
                   if (_showFinalSlide) ...[
-                    Text(
+                    const Text(
                       'Step 3: Check the Interior',
                       style: TextStyle(
                         fontSize: 24,
@@ -448,7 +523,7 @@ class _SideSelectionScreenState extends State<SideSelectionScreen>
                         color: Colors.redAccent,
                       ),
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     Text(
                       'Click on the image above to view the interior of the building.',
                       style: TextStyle(
@@ -461,7 +536,7 @@ class _SideSelectionScreenState extends State<SideSelectionScreen>
                 ],
               ),
             ),
-            SizedBox(width: 20),
+            const SizedBox(width: 20),
             Expanded(
               flex: 5,
               child: GestureDetector(
@@ -524,7 +599,7 @@ class _CustomTextField extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: TextField(
         decoration: InputDecoration(
-          border: OutlineInputBorder(),
+          border: const OutlineInputBorder(),
           hintText: hintText,
         ),
       ),
@@ -543,7 +618,7 @@ class _CustomDropdown extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: DropdownButtonFormField<String>(
-        decoration: InputDecoration(
+        decoration: const InputDecoration(
           border: OutlineInputBorder(),
         ),
         hint: Text(hintText),
@@ -558,3 +633,5 @@ class _CustomDropdown extends StatelessWidget {
     );
   }
 }
+
+
