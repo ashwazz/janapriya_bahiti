@@ -287,6 +287,35 @@ class Screen2 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white.withOpacity(0.8),
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            color: Colors.black12,
+          ),
+        ),
+        title: Row(
+          children: [
+            Container(
+              height: MediaQuery.of(context).size.height * 0.08,
+              child: Image.asset("assets/images/jana_logo.png"),
+            ),
+            const Spacer(),
+            const _NavBarItem(title: 'Home'),
+            const _NavBarItem(title: 'Store'),
+            const _NavBarItem(title: 'Projects'),
+            const _NavBarItem(title: 'Technology'),
+            const _NavBarItem(title: 'About Us'),
+            const _NavBarItem(title: 'Contact'),
+            IconButton(
+              icon: const Icon(Icons.account_circle, color: Colors.black),
+              onPressed: () {},
+            ),
+          ],
+        ),
+        elevation: 0,
+        automaticallyImplyLeading: false,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Row(
@@ -325,10 +354,50 @@ class Screen2 extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Please choose any apartment block from the map to begin the process.',
+                    'Please choose any apartment block from the map to begin the process. Each block offers unique features and amenities:',
                     style: TextStyle(
                       fontSize: 18,
                       color: Colors.grey[700],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Block A: Offers a scenic view of the park and includes a community hall.',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Block B: Features a rooftop swimming pool and a modern gym.',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Block C: Known for its spacious apartments and proximity to the shopping center.',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Block D: Includes a children’s play area and a pet-friendly environment.',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Block E: Offers premium penthouses with private terraces and garden views.',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.black87,
                     ),
                   ),
                 ],
@@ -449,7 +518,34 @@ class _SideSelectionScreenState extends State<SideSelectionScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Choose Building Side'),
+        backgroundColor: Colors.white.withOpacity(0.8),
+              flexibleSpace: Container(
+                decoration: const BoxDecoration(
+                  color: Colors.black12,
+                ),
+              ),
+        title: Row(
+          children: [
+            IconButton(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.arrow_back)),
+            Container(
+              height: MediaQuery.of(context).size.height * 0.08,
+              child: Image.asset("assets/images/jana_logo.png"),
+            ),
+            const Spacer(),
+            const _NavBarItem(title: 'Home'),
+            const _NavBarItem(title: 'Store'),
+            const _NavBarItem(title: 'Projects'),
+            const _NavBarItem(title: 'Technology'),
+            const _NavBarItem(title: 'About Us'),
+            const _NavBarItem(title: 'Contact'),
+            IconButton(
+              icon: const Icon(Icons.account_circle, color: Colors.black),
+              onPressed: () {},
+            ),
+          ],
+        ),
+        elevation: 0,
+        automaticallyImplyLeading: false,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -542,7 +638,7 @@ class _SideSelectionScreenState extends State<SideSelectionScreen>
               child: GestureDetector(
                 onTap: _onTap,
                 child: Stack(
-                  alignment: Alignment.center,
+                  alignment: Alignment.centerRight,
                   children: [
                     if (_showInitialImage)
                       Image.asset(
@@ -633,5 +729,8 @@ class _CustomDropdown extends StatelessWidget {
     );
   }
 }
+
+
+
 
 
