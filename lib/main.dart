@@ -47,11 +47,6 @@ class _JanapriyaUpscalePageState extends State<JanapriyaUpscalePage> with Single
         // Sync Lottie animation with scroll
         _syncLottieWithScroll();
 
-        // Trigger auto-scroll if user scrolls too fast
-        if (_scrollSpeed > 30) { // Adjust threshold as needed
-          _triggerAutoScroll();
-        }
-
         // Show or hide the app bar based on scroll direction
         if (_scrollController.position.userScrollDirection == ScrollDirection.reverse) {
           setState(() {
@@ -63,11 +58,6 @@ class _JanapriyaUpscalePageState extends State<JanapriyaUpscalePage> with Single
           });
         }
       }
-    });
-
-    // Delay the auto-scrolling until after the first frame is rendered
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _triggerAutoScroll();
     });
   }
 
@@ -91,7 +81,7 @@ class _JanapriyaUpscalePageState extends State<JanapriyaUpscalePage> with Single
   void _triggerAutoScroll() {
     _isAutoScrolling = true;
 
-    // Scroll to the bottom smoothly, or continue scrolling if at maxScrollExtent
+    // Scroll to the bottom smoothly
     _scrollController.animateTo(
       _scrollController.position.maxScrollExtent, // Scroll to the bottom
       duration: const Duration(seconds: 3), // Adjust speed to match your needs
@@ -101,6 +91,12 @@ class _JanapriyaUpscalePageState extends State<JanapriyaUpscalePage> with Single
       _syncLottieWithScroll();
       _isAutoScrolling = false;
     });
+  }
+
+  // New method to handle "Choose Home" navigation
+  void _chooseHome() {
+    _triggerAutoScroll(); // Scroll to the end
+    _animationController.forward(from: 0); // Start the Lottie animation
   }
 
   @override
@@ -130,6 +126,13 @@ class _JanapriyaUpscalePageState extends State<JanapriyaUpscalePage> with Single
                     child: Image.asset("assets/images/jana_logo.png"),
                   ),
                   const Spacer(),
+                  TextButton(
+                    onPressed: _chooseHome, // Trigger the choose home action
+                    child: const Text(
+                      'Choose Home',
+                      style: TextStyle(color: Colors.black),
+                    ),
+                  ),
                   const _NavBarItem(title: 'Home'),
                   const _NavBarItem(title: 'Store'),
                   const _NavBarItem(title: 'Projects'),
@@ -163,6 +166,7 @@ class _JanapriyaUpscalePageState extends State<JanapriyaUpscalePage> with Single
                         style: TextStyle(
                           fontSize: 36,
                           fontWeight: FontWeight.bold,
+                          color: Color.fromRGBO(60, 135, 112, 1)
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -199,6 +203,10 @@ class _JanapriyaUpscalePageState extends State<JanapriyaUpscalePage> with Single
                           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                         ),
                       ),
+                      const SizedBox(height: 32),
+                      const Text("The Houses have the following amenities available"),
+                      const SizedBox(height: 32),
+                      Image.asset('assets/images/info.jpg'), // Add the new image here
                       const SizedBox(height: 30),
                       const Text(
                         "Try our method of choosing a house of your preference in 3 steps",
@@ -229,10 +237,7 @@ class _JanapriyaUpscalePageState extends State<JanapriyaUpscalePage> with Single
                           ),
                         ],
                       ),
-                      const SizedBox(height: 32),
-                      const Text("The Houses have the following amenities available"),
-                      const SizedBox(height: 32),
-                      Image.asset('assets/images/info.jpg'), // Add the new image here
+                      const SizedBox(height: 20),
                     ],
                   ),
                 ),
@@ -241,11 +246,11 @@ class _JanapriyaUpscalePageState extends State<JanapriyaUpscalePage> with Single
             Expanded(
               flex: 2,
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                padding: const EdgeInsets.symmetric(horizontal: 4.0),
                 child: Lottie.asset(
                   'assets/lottie/1st_seq_lottie.json',
                   controller: _animationController,
-                  width: MediaQuery.of(context).size.width * 0.3, // Limit Lottie file width to 0.3 screen width
+                  width: MediaQuery.of(context).size.width * 0.2, // Limit Lottie file width to 0.2 screen width
                   onLoaded: (composition) {
                     _animationController.duration = composition.duration;
                   },
@@ -469,9 +474,7 @@ class _SideSelectionScreenState extends State<SideSelectionScreen>
     // Preload images for smoother transitions
     precacheImage(const AssetImage('assets/images/build1.jpg'), context);
     precacheImage(const AssetImage('assets/images/build2.jpg'), context);
-    
-    // Preload Lottie animation
-    precacheImage(const NetworkImage('https://assets/lottiefiles.com/path/to/your/lottie.json'), context);
+    precacheImage(const AssetImage('assets/images/Fp_removedBg.png'), context);
   }
 
   @override
@@ -519,11 +522,11 @@ class _SideSelectionScreenState extends State<SideSelectionScreen>
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white.withOpacity(0.8),
-              flexibleSpace: Container(
-                decoration: const BoxDecoration(
-                  color: Colors.black12,
-                ),
-              ),
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            color: Colors.black12,
+          ),
+        ),
         title: Row(
           children: [
             IconButton(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.arrow_back)),
@@ -547,13 +550,13 @@ class _SideSelectionScreenState extends State<SideSelectionScreen>
         elevation: 0,
         automaticallyImplyLeading: false,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      body: Container(
+        margin: EdgeInsets.symmetric(vertical: 5),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
-              flex: 2,
+              flex: 3,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -632,38 +635,68 @@ class _SideSelectionScreenState extends State<SideSelectionScreen>
                 ],
               ),
             ),
+            SizedBox(width: 90,),
+            if(_showInitialImage)
+            Image.asset(
+              'assets/images/mp_removedBg.png',
+              fit: BoxFit.contain,
+              height: MediaQuery.of(context).size.height,
+            ),
+            if(_showLottieAnimation)
+            Image.asset(
+                        'assets/images/Fp_removedBg.png',
+                        fit: BoxFit.contain,
+                        // width: double.infinity,
+                        height: MediaQuery.of(context).size.height,
+                      ),
+            if(_showFinalSlide)
+            Image.asset(
+                        'assets/images/Fp_removedBg.png',
+                        fit: BoxFit.contain,
+                        // width: double.infinity,
+                        height: MediaQuery.of(context).size.height,
+                      ),
+
             const SizedBox(width: 20),
             Expanded(
               flex: 5,
               child: GestureDetector(
                 onTap: _onTap,
                 child: Stack(
-                  alignment: Alignment.centerRight,
+                  alignment: Alignment.center,
                   children: [
+                    
                     if (_showInitialImage)
-                      Image.asset(
-                        'assets/images/build1.jpg',
-                        fit: BoxFit.contain,
-                        width: double.infinity,
-                        height: MediaQuery.of(context).size.height,
+                      Positioned(
+                        right: 0,
+                        child: Image.asset(
+                          'assets/images/build1.jpg',
+                          fit: BoxFit.contain,
+                          height: MediaQuery.of(context).size.height,
+                        ),
                       ),
                     if (_showLottieAnimation)
-                      Lottie.asset(
-                        'assets/lottie/ne_camera_lottie.json',
-                        controller: _animationController,
-                        onLoaded: (composition) {
-                          _animationController.duration = composition.duration;
-                        },
+                      Positioned(
+                        right: 0,
+                        child: Lottie.asset(
+                          'assets/lottie/ne_camera_lottie.json',
+                          controller: _animationController,
+                          height: MediaQuery.of(context).size.height,
+                          onLoaded: (composition) {
+                            _animationController.duration = composition.duration;
+                          },
+                        ),
                       ),
-                    // Show the final slide with Step 3
                     if (_showFinalSlide)
-                      GestureDetector(
-                        onTap: _openLink, // Launch URL on image tap
-                        child: Image.asset(
-                          'assets/images/build2.jpg', // Final image path
-                          fit: BoxFit.contain,
-                          // width: double.infinity,
-                          height: MediaQuery.of(context).size.height, // Adjust height for layout
+                      Positioned(
+                        right: 0,
+                        child: GestureDetector(
+                          onTap: _openLink, // Launch URL on image tap
+                          child: Image.asset(
+                            'assets/images/build2.jpg', // Final image path
+                            fit: BoxFit.contain,
+                            height: MediaQuery.of(context).size.height, // Adjust height for layout
+                          ),
                         ),
                       ),
                   ],
@@ -729,6 +762,8 @@ class _CustomDropdown extends StatelessWidget {
     );
   }
 }
+
+
 
 
 
