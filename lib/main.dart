@@ -237,7 +237,7 @@ class _JanapriyaUpscalePageState extends State<JanapriyaUpscalePage> with Single
                           ),
                         ],
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 30),
                     ],
                   ),
                 ),
